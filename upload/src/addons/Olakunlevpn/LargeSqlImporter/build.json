@@ -1,0 +1,6 @@
+{
+    "additional_files": [
+        "install/large-sql-importer.php",
+        "install/sql-importer.php"
+    ]
+}

@@ -1,0 +1,28 @@
+.exclude
+
+# dependencies
+node_modules/
+vendor/
+
+# build artifacts
+dist/
+build/
+out/
+_releases/
+*.zip
+
+# logs
+*.log
+
+# os
+.DS_Store
+Thumbs.db
+
+# editors
+.idea/
+.vscode/
+
+# temp
+tmp/
+temp/
+.tmp/

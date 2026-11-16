@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<routes>
+  <route route_type="admin" route_prefix="large-sql-importer" controller="Olakunlevpn\LargeSqlImporter\Admin\Controller\LargeSqlImporter"/>
+</routes>

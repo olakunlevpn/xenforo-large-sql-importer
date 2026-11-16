@@ -1,0 +1,25 @@
+{
+    "legacy_addon_id": "",
+    "title": "[Olakunlevpn] Large SQL Importer & Chunk Merger",
+    "description": "High-performance streaming SQL dump importer and chunked archive merger built for XenForo disaster recovery and migrations.",
+    "version_id": 1000070,
+    "version_string": "1.0.0",
+    "dev": "Olakunlevpn",
+    "dev_url": "https://maylancer.org",
+    "faq_url": "",
+    "support_url": "https://maylancer.org/support",
+    "extra_urls": {
+        "Product Information": "https://maylancer.org/products"
+    },
+    "require": {
+        "XF": [
+            2030010,
+            "XenForo 2.3.0+"
+        ],
+        "php": [
+            "7.4.0",
+            "PHP 7.4.0+"
+        ]
+    },
+    "icon": "icon.png"
+}

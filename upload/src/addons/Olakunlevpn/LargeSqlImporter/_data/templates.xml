@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+  <template type="admin" title="large_sql_importer_list" version_id="1000070" version_string="1.0.0"><![CDATA[<xf:title>{{ phrase('large_sql_importer') }}</xf:title>
+
+<div class="block">
+	<div class="block-container">
+		<h2 class="block-header">{{ phrase('large_sql_importer') }}</h2>
+		<div class="block-body">
+			<div class="block-row">
+				<p>
+					{{ phrase('large_sql_importer_admin_desc') }}
+				</p>
+				<div class="block-rowMessage block-rowMessage--info">
+					<strong>{{ phrase('emergency_standalone_mode') }}:</strong>
+					<p style="margin: 4px 0 8px 0;">
+						{{ phrase('large_sql_importer_standalone_info') }}
+					</p>
+					<div style="background: hsla(var(--xf-paletteNeutral1--h), var(--xf-paletteNeutral1--s), calc(var(--xf-paletteNeutral1--l) - 3%), 1); padding: 8px 12px; border: 1px dashed hsla(var(--xf-borderColor)); border-radius: 4px; font-family: monospace;">
+						{$installUrl}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="block-footer">
+			<a href="{$installUrl}" class="button button--primary" target="_blank">
+				<xf:fa icon="fa-external-link" />
+				<span class="button-text">{{ phrase('launch_large_sql_importer') }}</span>
+			</a>
+		</div>
+	</div>
+</div>
+]]></template>
+</templates>
