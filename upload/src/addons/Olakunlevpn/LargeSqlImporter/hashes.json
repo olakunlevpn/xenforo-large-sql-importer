@@ -4,7 +4,7 @@
     "src/addons/Olakunlevpn/LargeSqlImporter/Cli/Command/Import.php": "4e3fd6b6df448e484c33b2b4085027931fd63799a2d5268c7f8e8afa1ebe2bb4",
     "src/addons/Olakunlevpn/LargeSqlImporter/icon.png": "6c25163ec2fea356a44bc730d8eaab649b0dafcd93fbb068633da60062745aa9",
     "src/addons/Olakunlevpn/LargeSqlImporter/README.md": "479a5c7c224d309fee1af11dabdd9f27a35ee816d71904994edc72525ae9ffa4",
-    "src/addons/Olakunlevpn/LargeSqlImporter/Runner.php": "31c6e5d59837e1eb3f6979e842cfe10a139f98d8adb7ccb240843afaddb64fb7",
+    "src/addons/Olakunlevpn/LargeSqlImporter/Runner.php": "edf383b8979218fa719332a75282e617779171df557ac8e09266fa3bc38ea523",
     "src/addons/Olakunlevpn/LargeSqlImporter/Setup.php": "839b0389dba8fc3d801bb8806d971d651e5f8bfa3a1373e21a454d3fbe697f7d",
     "src/addons/Olakunlevpn/LargeSqlImporter/standalone.php": "e6fbc9344d9d10324315293a25723a338d2d954d3522509302596564fb64ea5c",
     "src/addons/Olakunlevpn/LargeSqlImporter/_data/activity_summary_definitions.xml": "99d8c2563a31320d66f958fc8bda78613545f5f7959bb3cf5318805e3a3c39d2",

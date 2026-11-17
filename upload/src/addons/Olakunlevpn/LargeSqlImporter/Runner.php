@@ -1045,18 +1045,16 @@ class Runner
         $this->jsonOut(['success' => true, 'groups' => $this->getChunkGroups()]);
     }
 
-    protected function ajaxMergeChunks(): void
+    public function doMergeChunks(string $baseName, string $password = '', bool $deleteChunks = false): array
     {
         @set_time_limit(600);
         @ini_set('memory_limit', '512M');
 
-        $baseName = trim((string)($_POST['base_name'] ?? ''));
-        $password = (string)($_POST['password'] ?? '');
-        $deleteChunks = !empty($_POST['delete_chunks']);
+        $baseName = trim($baseName);
 
         if ($baseName === '')
         {
-            $this->jsonOut(['success' => false, 'error' => 'Missing chunk base name.'], 400);
+            return ['success' => false, 'error' => 'Missing chunk base name.'];
         }
 
         $allFiles = (array)glob($this->uploadDir . '/*');
@@ -1080,7 +1078,7 @@ class Runner
 
         if (empty($parts))
         {
-            $this->jsonOut(['success' => false, 'error' => 'No chunks found for base name.'], 404);
+            return ['success' => false, 'error' => 'No chunks found for base name.'];
         }
 
         usort($parts, fn($a, $b) => strnatcasecmp((string)$a['part_key'], (string)$b['part_key']));
@@ -1101,7 +1099,7 @@ class Runner
         $hasSaltedMagic = str_starts_with($header16, 'Salted__');
         if (($isEncryptedName || $hasSaltedMagic) && $password === '')
         {
-            $this->jsonOut(['success' => false, 'error' => 'This backup archive is encrypted with AES-256 (.enc). Please enter your decryption key to merge it.'], 400);
+            return ['success' => false, 'error' => 'This backup archive is encrypted with AES-256 (.enc). Please enter your decryption key to merge it.'];
         }
 
         $mergedBytes = 0;
@@ -1171,7 +1169,7 @@ class Runner
                             $errMsg = trim($stderr);
                             if (stripos($errMsg, 'bad decrypt') !== false || stripos($errMsg, 'error') !== false)
                             {
-                                $this->jsonOut(['success' => false, 'error' => 'Decryption failed: Invalid encryption key or corrupted archive.'], 400);
+                                return ['success' => false, 'error' => 'Decryption failed: Invalid encryption key or corrupted archive.'];
                             }
                         }
                     }
@@ -1183,7 +1181,7 @@ class Runner
                     $out = @fopen($outPath, 'wb');
                     if (!$out)
                     {
-                        $this->jsonOut(['success' => false, 'error' => "Cannot create output file '$outName'."], 500);
+                        return ['success' => false, 'error' => "Cannot create output file '$outName'."];
                     }
 
                     $fp0 = @fopen($parts[0]['path'], 'rb');
@@ -1217,7 +1215,7 @@ class Runner
                     {
                         fclose($out);
                         @unlink($outPath);
-                        $this->jsonOut(['success' => false, 'error' => 'Decryption failed. Please verify your encryption key.'], 400);
+                        return ['success' => false, 'error' => 'Decryption failed. Please verify your encryption key.'];
                     }
 
                     fwrite($out, $plain);
@@ -1232,7 +1230,7 @@ class Runner
                 $out = @fopen($outPath, 'wb');
                 if (!$out)
                 {
-                    $this->jsonOut(['success' => false, 'error' => "Cannot create output file '$outName'."], 500);
+                    return ['success' => false, 'error' => "Cannot create output file '$outName'."];
                 }
 
                 foreach ($parts as $p)
@@ -1242,7 +1240,7 @@ class Runner
                     {
                         fclose($out);
                         @unlink($outPath);
-                        $this->jsonOut(['success' => false, 'error' => "Corrupted chunk '" . $p['filename'] . "'."], 400);
+                        return ['success' => false, 'error' => "Corrupted chunk '" . $p['filename'] . "'."];
                     }
 
                     $iv = substr($chunkData, 0, 16);
@@ -1253,7 +1251,7 @@ class Runner
                     {
                         fclose($out);
                         @unlink($outPath);
-                        $this->jsonOut(['success' => false, 'error' => 'Decryption failed. Please verify your encryption key.'], 400);
+                        return ['success' => false, 'error' => 'Decryption failed. Please verify your encryption key.'];
                     }
 
                     fwrite($out, $plaintext);
@@ -1268,7 +1266,7 @@ class Runner
             $out = @fopen($outPath, 'wb');
             if (!$out)
             {
-                $this->jsonOut(['success' => false, 'error' => "Cannot create output file '$outName'."], 500);
+                return ['success' => false, 'error' => "Cannot create output file '$outName'."];
             }
 
             foreach ($parts as $p)
@@ -1279,7 +1277,7 @@ class Runner
                 {
                     fclose($out);
                     @unlink($outPath);
-                    $this->jsonOut(['success' => false, 'error' => "Cannot read chunk file '" . $p['filename'] . "'."], 500);
+                    return ['success' => false, 'error' => "Cannot read chunk file '" . $p['filename'] . "'."];
                 }
 
                 while (!feof($in))
@@ -1302,12 +1300,26 @@ class Runner
             }
         }
 
-        $this->jsonOut([
+        return [
             'success' => true,
             'output_file' => $outName,
             'total_size' => $mergedBytes,
             'total_size_formatted' => $this->formatBytes($mergedBytes)
-        ]);
+        ];
+    }
+
+    protected function ajaxMergeChunks(): void
+    {
+        $baseName = trim((string)($_POST['base_name'] ?? ''));
+        $password = (string)($_POST['password'] ?? '');
+        $deleteChunks = !empty($_POST['delete_chunks']);
+
+        $res = $this->doMergeChunks($baseName, $password, $deleteChunks);
+        if (!$res['success'])
+        {
+            $this->jsonOut($res, 400);
+        }
+        $this->jsonOut($res);
     }
 
     protected function ajaxDeleteChunks(): void
