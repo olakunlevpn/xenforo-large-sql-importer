@@ -1574,7 +1574,7 @@ class Runner
 										<dd>
 											<input type="password" id="ctrl_tab_encryption_key" class="input" placeholder="Enter AES-256 decryption key if backup chunks are encrypted..." autocomplete="off" oninput="syncTabEncryptionKey(this.value)" />
 											<div class="formRow-explain">
-												If your multi-part backup was created with client-side AES-256 encryption via <strong>Olakunlevpn/TelegramBackup</strong>, enter your secret encryption key here. It will be used automatically to decrypt chunks during reassembly. Leave blank if chunks are unencrypted.
+												If your multi-part backup was created with client-side AES-256 encryption via <a href="https://xenforo.com/community/resources/olakunlevpn-telegram-free-cloud-backup.11018/" target="_blank" rel="noopener"><strong>[Olakunlevpn] Telegram Free Cloud Backup</strong></a>, enter your secret encryption key here. It will be used automatically to decrypt chunks during reassembly. Leave blank if chunks are unencrypted.
 											</div>
 										</dd>
 									</dl>
@@ -1788,7 +1788,7 @@ class Runner
 							<dd>
 								<input type="password" id="ctrl_merge_password" class="input" autocomplete="off" placeholder="Leave blank if backup is unencrypted" />
 								<div class="formRow-explain">
-									If this backup was created with client-side AES-256 encryption via <strong>Olakunlevpn/TelegramBackup</strong>, enter your secret encryption key here. Leave blank if unencrypted.
+									If this backup was created with client-side AES-256 encryption via <a href="https://xenforo.com/community/resources/olakunlevpn-telegram-free-cloud-backup.11018/" target="_blank" rel="noopener"><strong>[Olakunlevpn] Telegram Free Cloud Backup</strong></a>, enter your secret encryption key here. Leave blank if unencrypted.
 								</div>
 							</dd>
 						</dl>

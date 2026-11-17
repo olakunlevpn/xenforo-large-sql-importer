@@ -2,7 +2,7 @@
 
 High-performance streaming SQL dump importer and chunked archive reassembler built for XenForo disaster recovery, server migrations, and automated pipelines.
 
-Official companion utility for **[Olakunlevpn] Telegram Free Cloud Backup**.
+Official companion utility for [**[Olakunlevpn] Telegram Free Cloud Backup**](https://xenforo.com/community/resources/olakunlevpn-telegram-free-cloud-backup.11018/).
 
 ---
 
@@ -30,7 +30,7 @@ Official companion utility for **[Olakunlevpn] Telegram Free Cloud Backup**.
    Streams multi-gigabyte `.sql` and compressed `.sql.gz` dumps in micro-batches under 16 MB PHP RAM. Automatically handles foreign keys, unique checks, multi-line statements, and custom DELIMITER blocks. If connection is interrupted, state is preserved for zero-loss resumption.
 
 5. **Encrypted Chunk Merger:**
-   Automatically detects, verifies, concatenates, and decrypts split `.part*` and `.enc` backup chunks created by **[Olakunlevpn] Telegram Free Cloud Backup** using AES-256-CBC with PBKDF2 salt derivation.
+   Automatically detects, verifies, concatenates, and decrypts split `.part*` and `.enc` backup chunks created by [**[Olakunlevpn] Telegram Free Cloud Backup**](https://xenforo.com/community/resources/olakunlevpn-telegram-free-cloud-backup.11018/) using AES-256-CBC with PBKDF2 salt derivation.
 
 ---
 

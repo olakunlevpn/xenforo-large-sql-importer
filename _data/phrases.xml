@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <phrases>
-  <phrase title="emergency_standalone_mode" version_id="1000070" version_string="1.0.0"><![CDATA[Emergency Standalone & CLI Mode]]></phrase>
   <phrase title="large_sql_importer" version_id="1000070" version_string="1.0.0"><![CDATA[=Large SQL Importer & Chunk Merger]]></phrase>
-  <phrase title="large_sql_importer_admin_desc" version_id="1000070" version_string="1.0.0"><![CDATA[High-performance streaming SQL dump importer and chunked archive merger built for XenForo disaster recovery and large database migrations.]]></phrase>
-  <phrase title="large_sql_importer_standalone_info" version_id="1000070" version_string="1.0.0"><![CDATA[The importer functions even when XenForo database tables are corrupt or dropped. For automated pipelines, headless migrations, or emergency offline operations, run via CLI:]]></phrase>
-  <phrase title="launch_large_sql_importer" version_id="1000070" version_string="1.0.0"><![CDATA[Launch Large SQL Importer]]></phrase>
-  <phrase title="no_dump_files_found" version_id="1000070" version_string="1.0.0"><![CDATA[No dump or chunk files currently found in internal_data/sql_import/.]]></phrase>
-  <phrase title="php_environment_limits" version_id="1000070" version_string="1.0.0"><![CDATA[PHP Environment Limits]]></phrase>
-  <phrase title="run_in_admin_session" version_id="1000070" version_string="1.0.0"><![CDATA[Run in Admin Session]]></phrase>
-  <phrase title="staged_import_directory" version_id="1000070" version_string="1.0.0"><![CDATA[Staged Import Directory]]></phrase>
-  <phrase title="staged_sql_dumps_chunks" version_id="1000070" version_string="1.0.0"><![CDATA[Staged SQL Dumps & Chunks]]></phrase>
 </phrases>
