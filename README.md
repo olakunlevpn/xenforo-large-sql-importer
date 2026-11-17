@@ -1,93 +1,83 @@
-# [Olakunlevpn] Large SQL Importer & Chunk Merger for XenForo
+# [Olakunlevpn] Large SQL Importer & Chunk Merger
 
-Stream large SQL dumps into MySQL and merge encrypted backup chunks directly in your browser.
-
-[![XenForo Version](https://img.shields.io/badge/XenForo-2.3.0%2B-blue.svg)](https://xenforo.com)
-[![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-purple.svg)](https://php.net)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![XenForo Resource](https://img.shields.io/badge/Download-XenForo%20Resource-orange.svg)](https://xenforo.com/community/resources/)
+High-performance streaming SQL dump importer and chunked archive reassembler built for XenForo disaster recovery, server migrations, and automated pipelines.
 
 Official companion utility for **[Olakunlevpn] Telegram Free Cloud Backup**.
 
 ---
 
-## Why this exists
+### Key Features
 
-Web-based database tools choke on multi-gigabyte dumps. You run into 504 gateway timeouts or out-of-memory errors halfway through a big table. Worse, if your database crashed and lost its tables, you can't even log into XenForo Admin CP to fix it.
+1. **Standard XenForo Add-on Integration:** 
+   Fully integrated into the XenForo 2.3 ecosystem. Access the tool directly from your Admin Control Panel under **Tools &rarr; Large SQL Importer** (`admin.php?large-sql-importer/`).
 
-This tool runs as a standalone script at `install/large-sql-importer.php`. It needs zero existing database tables and under 16 MB of PHP memory. It streams queries line by line so execution limits don't kill the import. No timeouts. If your connection drops, it saves your exact spot so you can resume right where you left off.
+2. **Dedicated Headless CLI Command:**
+   Run imports and chunk mergers natively via the XenForo command-line interface:
+   ```bash
+   php cmd.php xf-addon:large-sql-importer --action=list
+   php cmd.php xf-addon:large-sql-importer --action=import --file=forum_dump.sql
+   php cmd.php xf-addon:large-sql-importer --action=merge --base-name=backup_2026.sql
+   ```
 
-It also works alongside **[Olakunlevpn] Telegram Free Cloud Backup**. When Telegram splits your backup into chunks or encrypts it with AES-256, upload the parts. The tool puts them back together and decrypts them on your server so you don't have to fiddle with command line scripts.
+3. **Disaster Recovery Standalone Mode:**
+   If your XenForo database tables are corrupt, dropped, or completely offline and XenForo cannot boot, execute the standalone runner without framework dependencies:
+   ```bash
+   php src/addons/Olakunlevpn/LargeSqlImporter/standalone.php
+   ```
+   *(Optional web access: copy `standalone.php` to your web root or install directory to run in a browser).*
 
----
+4. **Ultra-Low Memory Streaming:**
+   Streams multi-gigabyte `.sql` and compressed `.sql.gz` dumps in micro-batches under 16 MB PHP RAM. Automatically handles foreign keys, unique checks, multi-line statements, and custom DELIMITER blocks. If connection is interrupted, state is preserved for zero-loss resumption.
 
-## What it handles
-
-* **Large SQL files:** Reads dumps in small 4 MB chunks. XenForo search index rows and compiled templates don't get truncated.
-* **Gzip dumps:** Imports `.sql.gz` archives on the fly without decompressing them to disk first.
-* **Chunk merger:** Joins `.part01`, `.001`, and `.enc` files back into a single dump.
-* **AES-256 decryption:** Decrypts password-protected Telegram backup chunks using server OpenSSL or pure PHP.
-* **Crash recovery:** Saves byte progress in JSON state files. Hit resume if your browser closes.
-* **Config editor:** Tests and updates your MySQL credentials in `src/config.php` without touching a text editor.
-
----
-
-## Quick Start (Restoring a Forum)
-
-1. Upload the `upload/` folder contents to your XenForo root directory.
-2. Drop your `.sql` dump or backup chunks into `internal_data/sql_import/`.
-3. Open `https://yourforum.com/install/large-sql-importer.php` in your browser.
-4. Check your database connection under the **Database Configuration** tab.
-5. If your backup has split or encrypted chunks, merge them on the **Chunk Merger & Decryptor** tab.
-6. Click **Import** on the **SQL Importer** tab and let it run.
-
-When you're done, delete `install/large-sql-importer.php` and your dump files from `internal_data/sql_import/` so nobody else can touch them.
+5. **Encrypted Chunk Merger:**
+   Automatically detects, verifies, concatenates, and decrypts split `.part*` and `.enc` backup chunks created by **[Olakunlevpn] Telegram Free Cloud Backup** using AES-256-CBC with PBKDF2 salt derivation.
 
 ---
 
-## Repository Structure
+### Quick Start
 
-```
-upload/
-├── install/
-│   ├── large-sql-importer.php
-│   └── sql-importer.php
-└── src/
-    └── addons/
-        └── Olakunlevpn/
-            └── LargeSqlImporter/
-                ├── addon.json
-                ├── build.json
-                ├── hashes.json
-                ├── icon.png
-                ├── README.md
-                ├── Runner.php
-                ├── Setup.php
-                ├── _data/
-                └── _output/
-LICENSE
-README.md
-```
+#### Installation (XenForo Standard)
+1. Download the release archive (`Olakunlevpn-LargeSqlImporter-1.0.0.zip`).
+2. In your XenForo Admin Control Panel, navigate to **Add-ons &rarr; Install / upgrade from archive** and upload the ZIP.
+3. Alternatively, extract and upload the `upload/` folder contents to your forum root, then click **Install** under **Add-ons**.
 
----
+#### Importing SQL Dumps
+1. Place your SQL dump file (e.g. `forum_backup.sql` or `forum_backup.sql.gz`) into:
+   ```
+   internal_data/sql_import/
+   ```
+2. Navigate to **Tools &rarr; Large SQL Importer** in Admin CP and click **Launch Large SQL Importer**, or execute from terminal:
+   ```bash
+   php cmd.php xf-addon:large-sql-importer --action=import --file=forum_backup.sql
+   ```
 
-## Requirements
-
-* XenForo 2.3.0+
-* PHP 7.4 through 8.3
-* MySQL 5.7+ or MariaDB 10.3+
-* PHP Extensions: `pdo_mysql`, `openssl`, `zlib`
+#### Merging Telegram Backup Chunks
+1. Place split chunk files (e.g. `backup.sql.gz.part01`, `backup.sql.gz.part02`, or `.enc`) into `internal_data/sql_import/`.
+2. In Admin CP or via CLI, run:
+   ```bash
+   php cmd.php xf-addon:large-sql-importer --action=merge --base-name=backup.sql.gz --key=YOUR_AES_KEY
+   ```
+3. Once merged, import the resulting file directly.
 
 ---
 
-## License
+### Requirements
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+* **XenForo:** 2.3.0+
+* **PHP:** 8.0+ (PHP 8.1, 8.2, 8.3 fully supported)
+* **MySQL / MariaDB:** MySQL 5.7+ / 8.0+ or MariaDB 10.3+
+* **PHP Extensions:** `mysqli` / `pdo_mysql`, `openssl` (for AES-256 decryption), `zlib` (for `.gz` dumps)
 
 ---
 
-## Support
+### Developer & Support
 
-* Product Information: [https://maylancer.org/products](https://maylancer.org/products)
-* Help Desk: [https://maylancer.org/support](https://maylancer.org/support)
-* Companion Add-on: [Olakunlevpn Telegram Free Cloud Backup](https://github.com/olakunlevpn/olakunlevpn-telegram-free-cloud-backup)
+* **Developer:** Olakunlevpn
+* **Website:** [https://maylancer.org](https://maylancer.org)
+* **Support:** [https://maylancer.org/support](https://maylancer.org/support)
+
+---
+
+### License
+
+MIT License. Free for commercial and non-commercial communities.

@@ -132,6 +132,12 @@ class Runner
 
     public function execute(): void
     {
+        if (PHP_SAPI === 'cli')
+        {
+            $this->executeCli();
+            return;
+        }
+
         $action = $_REQUEST['action'] ?? '';
 
         switch ($action)
@@ -167,6 +173,344 @@ class Runner
                 $this->renderUi();
                 break;
         }
+    }
+
+    public function executeCli(): void
+    {
+        $output = new class {
+            public function writeln(string $msg = ''): void
+            {
+                $clean = preg_replace('/<[^>]+>/', '', $msg);
+                echo $clean . PHP_EOL;
+            }
+            public function write(string $msg = ''): void
+            {
+                $clean = preg_replace('/<[^>]+>/', '', $msg);
+                echo $clean;
+            }
+        };
+
+        global $argv;
+        $args = $argv ?? [];
+        $action = 'list';
+        $options = [];
+
+        for ($i = 1; $i < count($args); $i++)
+        {
+            $arg = $args[$i];
+            if (str_starts_with($arg, '--action='))
+            {
+                $action = substr($arg, 9);
+            }
+            else if (str_starts_with($arg, '--file='))
+            {
+                $options['file'] = substr($arg, 7);
+                $action = 'import';
+            }
+            else if (str_starts_with($arg, '--base-name='))
+            {
+                $options['baseName'] = substr($arg, 12);
+                $action = 'merge';
+            }
+            else if (str_starts_with($arg, '--key='))
+            {
+                $options['key'] = substr($arg, 6);
+            }
+            else if ($arg === '--delete-chunks')
+            {
+                $options['deleteChunks'] = true;
+            }
+            else if ($arg === 'test-db' || $arg === 'list' || $arg === 'import' || $arg === 'merge')
+            {
+                $action = $arg;
+            }
+        }
+
+        $code = $this->runCli($output, $action, $options);
+        exit($code);
+    }
+
+    public function runCli($output, string $action = 'list', array $options = []): int
+    {
+        switch ($action)
+        {
+            case 'test-db':
+                $output->writeln('<info>Testing Database Connection...</info>');
+                $output->writeln('Host: ' . ($this->dbConfig['host'] ?? 'N/A') . ':' . ($this->dbConfig['port'] ?? 3306));
+                $output->writeln('Database: ' . ($this->dbConfig['dbname'] ?? 'N/A'));
+                $output->writeln('User: ' . ($this->dbConfig['username'] ?? 'N/A'));
+                if ($this->db)
+                {
+                    $output->writeln('<info>Connection Successful! (MySQL ' . $this->db->server_info . ')</info>');
+                    return 0;
+                }
+                $output->writeln('<error>Connection Failed: ' . ($this->dbError ?: 'Could not connect') . '</error>');
+                return 1;
+
+            case 'merge':
+                $baseName = trim((string)($options['baseName'] ?? ''));
+                if ($baseName === '')
+                {
+                    $output->writeln('<error>Please specify chunk base name via --base-name=<name></error>');
+                    return 1;
+                }
+                return $this->cliMergeChunks($output, $baseName, (string)($options['key'] ?? ''), !empty($options['deleteChunks']));
+
+            case 'import':
+                $file = trim((string)($options['file'] ?? ''));
+                if ($file === '')
+                {
+                    $output->writeln('<error>Please specify SQL file name via --file=<filename.sql></error>');
+                    return 1;
+                }
+                return $this->cliImportFile($output, $file);
+
+            case 'list':
+            default:
+                $output->writeln('<info>===============================================================</info>');
+                $output->writeln('<info> [Olakunlevpn] Large SQL Importer & Chunk Merger </info>');
+                $output->writeln('<info>===============================================================</info>');
+                $output->writeln('Staged Directory: ' . $this->uploadDir);
+                $output->writeln('Database: ' . ($this->dbConfig['dbname'] ?? 'N/A') . ' (' . ($this->db ? 'Connected' : 'Not Connected') . ')');
+                $output->writeln('');
+
+                $files = $this->getSqlFiles();
+                $output->writeln('<comment>Available SQL Dump Files:</comment>');
+                if (empty($files))
+                {
+                    $output->writeln('  (No SQL dump files found in ' . $this->uploadDir . ')');
+                }
+                else
+                {
+                    foreach ($files as $f)
+                    {
+                        $status = $f['state'] ? ($f['state']['status'] ?? 'ready') : 'ready';
+                        $queries = $f['state'] ? ($f['state']['queries'] ?? 0) : 0;
+                        $output->writeln(sprintf('  - %-35s %10s  [%s - %d queries]', $f['name'], $f['size_formatted'], strtoupper($status), $queries));
+                    }
+                }
+
+                $output->writeln('');
+                $output->writeln('<comment>Available Chunk Groups:</comment>');
+                $chunks = $this->getChunkGroups();
+                if (empty($chunks))
+                {
+                    $output->writeln('  (No chunk groups found)');
+                }
+                else
+                {
+                    foreach ($chunks as $c)
+                    {
+                        $output->writeln(sprintf('  - %-35s %2d chunks (%s)%s', $c['base_name'], count($c['chunks']), $this->formatBytes($c['total_size']), $c['is_encrypted'] ? ' [ENCRYPTED]' : ''));
+                    }
+                }
+
+                $output->writeln('');
+                $output->writeln('Usage:');
+                $output->writeln('  php cmd.php xf-addon:large-sql-importer --action=test-db');
+                $output->writeln('  php cmd.php xf-addon:large-sql-importer --action=import --file=<name.sql>');
+                $output->writeln('  php cmd.php xf-addon:large-sql-importer --action=merge --base-name=<base>');
+                return 0;
+        }
+    }
+
+    public function cliImportFile($output, string $fileName): int
+    {
+        $fileName = basename($fileName);
+        $filePath = $this->uploadDir . '/' . $fileName;
+
+        if (!is_file($filePath))
+        {
+            $output->writeln("<error>File '$fileName' not found in {$this->uploadDir}</error>");
+            return 1;
+        }
+
+        if (!$this->db)
+        {
+            $output->writeln("<error>Database not connected: " . ($this->dbError ?: 'Unknown error') . "</error>");
+            return 1;
+        }
+
+        $isGz = str_ends_with(strtolower($fileName), '.gz');
+        $fileSize = filesize($filePath);
+
+        $output->writeln("<info>Starting SQL import for: $fileName (" . $this->formatBytes($fileSize) . ")</info>");
+
+        $fp = $isGz ? @gzopen($filePath, 'rb') : @fopen($filePath, 'rb');
+        if (!$fp)
+        {
+            $output->writeln("<error>Could not open file '$fileName' for streaming.</error>");
+            return 1;
+        }
+
+        $this->db->query("SET FOREIGN_KEY_CHECKS=0");
+        $this->db->query("SET UNIQUE_CHECKS=0");
+        $this->db->query("SET AUTOCOMMIT=1");
+        $this->db->query("SET SQL_MODE=''");
+
+        $startTime = microtime(true);
+        $lastPrint = 0.0;
+        $queriesExecuted = 0;
+        $buffer = '';
+        $delimiter = ';';
+        $inString = false;
+        $stringChar = '';
+        $isEscaped = false;
+        $errorsCount = 0;
+
+        while (true)
+        {
+            $line = $isGz ? gzgets($fp, 4194304) : fgets($fp, 4194304);
+            if ($line === false)
+            {
+                break;
+            }
+
+            $trimmedLine = trim($line);
+            if (!$inString)
+            {
+                if ($trimmedLine === '' || str_starts_with($trimmedLine, '--') || str_starts_with($trimmedLine, '#'))
+                {
+                    continue;
+                }
+
+                if (preg_match('/^DELIMITER\s+(.+)$/i', $trimmedLine, $m))
+                {
+                    $delimiter = trim($m[1]);
+                    continue;
+                }
+            }
+
+            $len = strlen($line);
+            for ($i = 0; $i < $len; $i++)
+            {
+                $ch = $line[$i];
+
+                if ($isEscaped)
+                {
+                    $isEscaped = false;
+                    $buffer .= $ch;
+                    continue;
+                }
+
+                if ($ch === '\\')
+                {
+                    $isEscaped = true;
+                    $buffer .= $ch;
+                    continue;
+                }
+
+                if ($inString)
+                {
+                    if ($ch === $stringChar)
+                    {
+                        $inString = false;
+                    }
+                    $buffer .= $ch;
+                    continue;
+                }
+
+                if ($ch === '\'' || $ch === '"' || $ch === '`')
+                {
+                    $inString = true;
+                    $stringChar = $ch;
+                    $buffer .= $ch;
+                    continue;
+                }
+
+                $delimLen = strlen($delimiter);
+                if (substr($line, $i, $delimLen) === $delimiter)
+                {
+                    $query = trim($buffer);
+                    $buffer = '';
+                    $i += $delimLen - 1;
+
+                    if ($query !== '')
+                    {
+                        if (!$this->db->query($query))
+                        {
+                            $err = $this->db->error;
+                            if (
+                                !str_contains($err, 'already exists') 
+                                && !str_contains($err, 'Unknown table')
+                                && !str_contains($err, "Variable '")
+                            )
+                            {
+                                $errorsCount++;
+                            }
+                        }
+                        $queriesExecuted++;
+                    }
+                    continue;
+                }
+
+                $buffer .= $ch;
+            }
+
+            $now = microtime(true);
+            if ($now - $lastPrint >= 0.5)
+            {
+                $lastPrint = $now;
+                $offset = $isGz ? gztell($fp) : ftell($fp);
+                $percent = ($fileSize > 0) ? min(100.0, ($offset / $fileSize) * 100.0) : 0;
+                $elapsed = max(0.1, $now - $startTime);
+                $speed = $offset / $elapsed;
+                $output->write(sprintf("\r  Progress: %5.1f%% | %10s/s | Queries: %d | Errors: %d", $percent, $this->formatBytes($speed), $queriesExecuted, $errorsCount));
+            }
+        }
+
+        if ($isGz)
+        {
+            gzclose($fp);
+        }
+        else
+        {
+            fclose($fp);
+        }
+
+        if (trim($buffer) !== '')
+        {
+            $this->db->query(trim($buffer));
+            $queriesExecuted++;
+        }
+
+        $totalElapsed = max(0.1, microtime(true) - $startTime);
+        $avgSpeed = $fileSize / $totalElapsed;
+
+        $state = [
+            'file_name' => $fileName,
+            'file_size' => $fileSize,
+            'offset' => $fileSize,
+            'queries' => $queriesExecuted,
+            'status' => 'completed',
+            'start_time' => (int)$startTime,
+            'last_update' => time(),
+            'errors' => []
+        ];
+        $this->saveState($fileName, $state);
+
+        $output->writeln('');
+        $output->writeln("<info>Import finished successfully!</info>");
+        $output->writeln("Total Queries: $queriesExecuted");
+        $output->writeln("Duration: " . $this->formatDuration((int)$totalElapsed));
+        $output->writeln("Average Speed: " . $this->formatBytes($avgSpeed) . "/s");
+        return 0;
+    }
+
+    public function cliMergeChunks($output, string $baseName, string $password = '', bool $deleteChunks = false): int
+    {
+        $output->writeln("<info>Merging chunk files for: $baseName...</info>");
+        $res = $this->doMergeChunks($baseName, $password, $deleteChunks);
+        if (!$res['success'])
+        {
+            $output->writeln("<error>Merge failed: " . $res['error'] . "</error>");
+            return 1;
+        }
+
+        $output->writeln("<info>Chunks merged successfully!</info>");
+        $output->writeln("Output File: " . $res['output_file']);
+        $output->writeln("Output Size: " . $res['total_size_formatted']);
+        return 0;
     }
 
     protected function jsonOut(array $data, int $status = 200): void
@@ -585,7 +929,7 @@ class Runner
         ]);
     }
 
-    protected function ajaxListChunks(): void
+    public function getChunkGroups(): array
     {
         $allFiles = (array)glob($this->uploadDir . '/*');
         $groups = [];
@@ -693,7 +1037,12 @@ class Runner
             ];
         }
 
-        $this->jsonOut(['success' => true, 'groups' => $result]);
+        return $result;
+    }
+
+    protected function ajaxListChunks(): void
+    {
+        $this->jsonOut(['success' => true, 'groups' => $this->getChunkGroups()]);
     }
 
     protected function ajaxMergeChunks(): void

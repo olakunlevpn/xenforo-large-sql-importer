@@ -37,10 +37,12 @@ class LargeSqlImporter extends AbstractController
             }
         }
 
-        $installUrl = $this->app()->options()->boardUrl . '/install/large-sql-importer.php';
+        $cliCommand = 'php cmd.php xf-addon:large-sql-importer';
+        $standaloneCli = 'php src/addons/Olakunlevpn/LargeSqlImporter/standalone.php';
 
         $viewParams = [
-            'installUrl' => $installUrl,
+            'cliCommand' => $cliCommand,
+            'standaloneCli' => $standaloneCli,
             'sqlImportDir' => $sqlImportDir,
             'isWritable' => $isWritable,
             'dumpFiles' => $dumpFiles,

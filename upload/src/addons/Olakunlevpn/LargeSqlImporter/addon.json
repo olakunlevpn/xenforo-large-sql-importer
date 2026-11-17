@@ -9,16 +9,17 @@
     "faq_url": "",
     "support_url": "https://maylancer.org/support",
     "extra_urls": {
-        "Product Information": "https://maylancer.org/products"
+        "Product Information": "https://maylancer.org/products",
+        "docs": "https://maylancer.org/docs/"
     },
     "require": {
         "XF": [
-            2030010,
+            2030070,
             "XenForo 2.3.0+"
         ],
         "php": [
-            "7.4.0",
-            "PHP 7.4.0+"
+            "8.0.0",
+            "PHP 8.0.0+"
         ]
     },
     "icon": "icon.png"

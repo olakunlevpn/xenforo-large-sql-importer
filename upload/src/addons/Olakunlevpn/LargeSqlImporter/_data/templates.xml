@@ -15,8 +15,11 @@
 					<p style="margin: 4px 0 8px 0;">
 						{{ phrase('large_sql_importer_standalone_info') }}
 					</p>
-					<div style="background: @xf-contentAltBg; padding: 8px 12px; border: 1px dashed @xf-borderColor; border-radius: @xf-borderRadiusSmall; font-family: monospace;">
-						{$installUrl}
+					<div style="background: @xf-contentAltBg; padding: 8px 12px; border: 1px dashed @xf-borderColor; border-radius: @xf-borderRadiusSmall; font-family: monospace; margin-bottom: 6px;">
+						{$cliCommand}
+					</div>
+					<div style="font-size: 12px; color: @xf-textColorMuted;">
+						Emergency / Offline Standalone: <code>{$standaloneCli}</code>
 					</div>
 				</div>
 			</div>
@@ -89,13 +92,9 @@
 		</div>
 		<div class="block-footer">
 			<span class="block-footer-controls">
-				<a href="{$installUrl}" class="button button--primary" target="_blank">
-					<xf:fa icon="fa-external-link" />
-					<span class="button-text">{{ phrase('launch_large_sql_importer') }}</span>
-				</a>
-				<a href="{{ link('large-sql-importer/run') }}" class="button" target="_blank">
+				<a href="{{ link('large-sql-importer/run') }}" class="button button--primary" target="_blank">
 					<xf:fa icon="fa-play" />
-					<span class="button-text">{{ phrase('run_in_admin_session') }}</span>
+					<span class="button-text">{{ phrase('launch_large_sql_importer') }}</span>
 				</a>
 			</span>
 		</div>
