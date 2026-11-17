@@ -1,0 +1,100 @@
+<xf:title>{{ phrase('large_sql_importer') }}</xf:title>
+
+<div class="block">
+	<div class="block-container">
+		<h2 class="block-header">{{ phrase('large_sql_importer') }}</h2>
+		<div class="block-body">
+			<div class="block-row">
+				<p>
+					{{ phrase('large_sql_importer_admin_desc') }}
+				</p>
+				<div class="block-rowMessage block-rowMessage--info">
+					<strong>{{ phrase('emergency_standalone_mode') }}:</strong>
+					<p style="margin: 4px 0 8px 0;">
+						{{ phrase('large_sql_importer_standalone_info') }}
+					</p>
+					<div style="background: @xf-contentAltBg; padding: 8px 12px; border: 1px dashed @xf-borderColor; border-radius: @xf-borderRadiusSmall; font-family: monospace; margin-bottom: 6px;">
+						{$cliCommand}
+					</div>
+					<div style="font-size: 12px; color: @xf-textColorMuted;">
+						Emergency / Offline Standalone: <code>{$standaloneCli}</code>
+					</div>
+				</div>
+			</div>
+
+			<h3 class="block-formSectionHeader">{{ phrase('staged_import_directory') }}</h3>
+			<div class="block-row">
+				<dl class="pairs pairs--columns pairs--fixedSmall">
+					<dt>{{ phrase('path') }}</dt>
+					<dd><code>{$sqlImportDir}</code></dd>
+				</dl>
+				<dl class="pairs pairs--columns pairs--fixedSmall">
+					<dt>{{ phrase('status') }}</dt>
+					<dd>
+						<xf:if is="$isWritable">
+							<span class="u-muted" style="color: @xf-paletteAccent2;">{{ phrase('writable') }}</span>
+						<xf:else />
+							<span class="u-muted" style="color: @xf-paletteAccent1;">{{ phrase('not_writable') }}</span>
+						</xf:if>
+					</dd>
+				</dl>
+			</div>
+
+			<h3 class="block-formSectionHeader">{{ phrase('php_environment_limits') }}</h3>
+			<div class="block-row">
+				<dl class="pairs pairs--columns pairs--fixedSmall">
+					<dt>upload_max_filesize</dt>
+					<dd>{$phpLimits.upload_max_filesize}</dd>
+				</dl>
+				<dl class="pairs pairs--columns pairs--fixedSmall">
+					<dt>post_max_size</dt>
+					<dd>{$phpLimits.post_max_size}</dd>
+				</dl>
+				<dl class="pairs pairs--columns pairs--fixedSmall">
+					<dt>memory_limit</dt>
+					<dd>{$phpLimits.memory_limit}</dd>
+				</dl>
+				<dl class="pairs pairs--columns pairs--fixedSmall">
+					<dt>max_execution_time</dt>
+					<dd>{$phpLimits.max_execution_time}s</dd>
+				</dl>
+			</div>
+
+			<h3 class="block-formSectionHeader">{{ phrase('staged_sql_dumps_chunks') }}</h3>
+			<div class="block-row">
+				<xf:if is="$dumpFiles is not empty">
+					<div class="dataList-scroller">
+						<table class="dataList">
+							<thead>
+								<tr class="dataList-row dataList-row--header">
+									<th class="dataList-cell">{{ phrase('file_name') }}</th>
+									<th class="dataList-cell dataList-cell--min">{{ phrase('size') }}</th>
+									<th class="dataList-cell dataList-cell--min">{{ phrase('date') }}</th>
+								</tr>
+							</thead>
+							<tbody class="dataList-rows">
+								<xf:foreach loop="$dumpFiles" value="$file">
+									<tr class="dataList-row">
+										<td class="dataList-cell"><strong>{$file.name}</strong></td>
+										<td class="dataList-cell dataList-cell--min">{$file.size|file_size}</td>
+										<td class="dataList-cell dataList-cell--min"><xf:date time="{$file.mtime}" /></td>
+									</tr>
+								</xf:foreach>
+							</tbody>
+						</table>
+					</div>
+				<xf:else />
+					<div class="block-cell">{{ phrase('no_dump_files_found') }}</div>
+				</xf:if>
+			</div>
+		</div>
+		<div class="block-footer">
+			<span class="block-footer-controls">
+				<a href="{{ $devLogin ? link('large-sql-importer/run', null, {'dev_login': 1}) : link('large-sql-importer/run') }}" class="button button--primary" target="_blank">
+					<xf:fa icon="fa-play" />
+					<span class="button-text">{{ phrase('launch_large_sql_importer') }}</span>
+				</a>
+			</span>
+		</div>
+	</div>
+</div>

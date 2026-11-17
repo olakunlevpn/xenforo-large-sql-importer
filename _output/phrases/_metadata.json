@@ -1,0 +1,62 @@
+{
+    "emergency_standalone_mode.txt": {
+        "global_cache": false,
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "354770958b326dd50491dffaf13ecd6a"
+    },
+    "large_sql_importer.txt": {
+        "global_cache": false,
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "939b96f09c5eef7a3ea0849e42ff7631"
+    },
+    "large_sql_importer_admin_desc.txt": {
+        "global_cache": false,
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "efcda4589a4fe43b8612ae0213890690"
+    },
+    "large_sql_importer_standalone_info.txt": {
+        "global_cache": false,
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "9a636f1dac0d8d883055691cf8c1451e"
+    },
+    "launch_large_sql_importer.txt": {
+        "global_cache": false,
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "9972d5a4b1f7607bfc9f66d1e161f4bd"
+    },
+    "no_dump_files_found.txt": {
+        "global_cache": false,
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "59d78c08b0c617ec049f83dc1394e352"
+    },
+    "php_environment_limits.txt": {
+        "global_cache": false,
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "9cbf07887610f6e9d732b1f6b0bbe6f1"
+    },
+    "run_in_admin_session.txt": {
+        "global_cache": false,
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "0e839da44f6728818bb9b188f680601c"
+    },
+    "staged_import_directory.txt": {
+        "global_cache": false,
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "c785148126776177e0623970d5122e63"
+    },
+    "staged_sql_dumps_chunks.txt": {
+        "global_cache": false,
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "e44f2f2425921ab97cb738921179ca1b"
+    }
+}
