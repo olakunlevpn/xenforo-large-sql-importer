@@ -9,7 +9,7 @@ Official companion utility for [**[Olakunlevpn] Telegram Free Cloud Backup**](ht
 ### Key Features
 
 1. **Standard XenForo Add-on Integration:** 
-   Fully integrated into the XenForo 2.3 ecosystem. Access the tool directly from your Admin Control Panel under **Tools &rarr; Large SQL Importer** (`admin.php?large-sql-importer/`).
+   Fully integrated into the XenForo 2.3 ecosystem. Access the tool directly from your Admin Control Panel under **Tools → Large SQL Importer** (`admin.php?large-sql-importer/`).
 
 2. **Dedicated Headless CLI Command:**
    Run imports and chunk mergers natively via the XenForo command-line interface:
@@ -38,7 +38,7 @@ Official companion utility for [**[Olakunlevpn] Telegram Free Cloud Backup**](ht
 
 #### Installation (XenForo Standard)
 1. Download the release archive (`Olakunlevpn-LargeSqlImporter-1.0.0.zip`).
-2. In your XenForo Admin Control Panel, navigate to **Add-ons &rarr; Install / upgrade from archive** and upload the ZIP.
+2. In your XenForo Admin Control Panel, navigate to **Add-ons → Install / upgrade from archive** and upload the ZIP.
 3. Alternatively, extract and upload the `upload/` folder contents to your forum root, then click **Install** under **Add-ons**.
 
 #### Importing SQL Dumps
@@ -46,7 +46,7 @@ Official companion utility for [**[Olakunlevpn] Telegram Free Cloud Backup**](ht
    ```
    internal_data/sql_import/
    ```
-2. Navigate to **Tools &rarr; Large SQL Importer** in Admin CP and click **Launch Large SQL Importer**, or execute from terminal:
+2. Navigate to **Tools → Large SQL Importer** in Admin CP and click **Launch Large SQL Importer**, or execute from terminal:
    ```bash
    php cmd.php xf-addon:large-sql-importer --action=import --file=forum_backup.sql
    ```
