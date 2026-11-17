@@ -1,0 +1,11 @@
+{
+    "parent_navigation_id": "tools",
+    "display_order": 95,
+    "link": "large-sql-importer",
+    "icon": "fa-database",
+    "admin_permission_id": "tools",
+    "debug_only": false,
+    "development_only": false,
+    "super_admin_only": false,
+    "hide_no_children": false
+}

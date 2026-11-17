@@ -1,4 +1,10 @@
 {
+    "admin_navigation.olLargeSqlImporter.txt": {
+        "global_cache": false,
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "8e0a19e4911fd151cd21d33373eaf9ee"
+    },
     "emergency_standalone_mode.txt": {
         "global_cache": false,
         "version_id": 1000070,
@@ -9,7 +15,7 @@
         "global_cache": false,
         "version_id": 1000070,
         "version_string": "1.0.0",
-        "hash": "939b96f09c5eef7a3ea0849e42ff7631"
+        "hash": "31fdc5c18bcbfce3819539f998886b8d"
     },
     "large_sql_importer_admin_desc.txt": {
         "global_cache": false,
