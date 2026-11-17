@@ -1,0 +1,1 @@
+The standalone importer functions even when XenForo database tables are corrupt or dropped. You can access it directly via your web browser at:
